@@ -9,7 +9,7 @@ const Login = () => {
     const [role, setRole] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const { loginUser, btnLoading } = UserData();
-    const navigate = useNavigate();
+    const navigate = useNavigate('/home');
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked);

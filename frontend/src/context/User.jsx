@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
         try {
             const { data } = await axios.post("/api/user/register", { name, email, password });
             toast.success(data.message);
-            // setIsAuth(true); 
+            setIsAuth(true); 
             navigate('/login');
         } catch (error) {
             toast.error(error.response?.data?.message || "Registration failed. Please try again.");
@@ -36,7 +36,7 @@ export const UserProvider = ({ children }) => {
             window.location.reload();
             setUser(data.user);
             setRole(data.user.role);
-            navigate('/');
+            navigate('/home');
         } catch (error) {
             toast.error(error.response?.data?.message || "Login failed. Please try again.");
         } finally {
