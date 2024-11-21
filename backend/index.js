@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { connectDB } from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import attendanceRouter from './routes/attendanceRoutes.js';
 dotenv.config();
 const app = express();
 const PORT = 5000;
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 // routes
 app.use("/api/user",userRoutes);
+app.use('/api/attendance',attendanceRouter);
 
 app.listen(PORT,()=>{
     console.log(`http://localhost:${PORT}`);

@@ -1,26 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAttendance } from '../context/Attendance';
 
 const localizer = momentLocalizer(moment);
 
 const Attendance = () => {
   const [showPopup, setShowPopup] = useState(false);
-  const [attendanceHistory, setAttendanceHistory] = useState(() => {
-    return JSON.parse(localStorage.getItem('attendanceHistory')) || [];
-  });
-
-  useEffect(() => {
-    const storedAttendance = JSON.parse(localStorage.getItem('attendanceHistory'));
-    setAttendanceHistory(storedAttendance);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('attendanceHistory', JSON.stringify(attendanceHistory));
-  }, [attendanceHistory]);
+  const { attendanceHistory, markAttendance, clearAttendanceHistory } = useAttendance();
 
   const handleSelectSlot = ({ start }) => {
     const today = moment().startOf('day');
@@ -28,22 +18,11 @@ const Attendance = () => {
     const isToday = selectedDate.isSame(today);
 
     if (isToday) {
-      if (attendanceHistory.includes(today.format('YYYY-MM-DD'))) {
-        toast.info('Attendance for today has already been marked!');
-      } else {
-        toast.success("Attendance marked for today!");
-        setAttendanceHistory(prev => [...prev, today.format('YYYY-MM-DD')]);
-        setShowPopup(false);
-      }
+      markAttendance(today.format('YYYY-MM-DD'));
+      setShowPopup(false);
     } else {
       setShowPopup(true);
     }
-  };
-
-  const handleClearHistory = () => {
-    setAttendanceHistory([]);
-    localStorage.removeItem('attendanceHistory');
-    toast.success("Attendance history cleared!");
   };
 
   return (
@@ -85,7 +64,7 @@ const Attendance = () => {
           )}
           {attendanceHistory.length > 0 && (
             <button
-              onClick={handleClearHistory}
+              onClick={clearAttendanceHistory}
               className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               Clear Attendance History

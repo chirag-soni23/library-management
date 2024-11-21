@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserData } from '../context/User';
 import { toast } from 'react-toastify';
+import { auth } from '../Firebase';
+import { sendPasswordResetEmail } from "firebase/auth";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -9,7 +11,7 @@ const Login = () => {
     const [role, setRole] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const { loginUser, btnLoading } = UserData();
-    const navigate = useNavigate('/home');
+    const navigate = useNavigate();
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked);
@@ -25,7 +27,22 @@ const Login = () => {
             toast.error("Please choose a role.");
             return;
         }
-        loginUser(email, password, role, navigate);
+        loginUser(email, password, role, () => navigate('/home'));
+    };
+
+    const handleForgotPassword = () => {
+        if (!email) {
+            toast.error("Please enter your email to reset your password.");
+            return;
+        }
+
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                toast.success("Password reset email sent! Check your inbox.");
+            })
+            .catch((error) => {
+                toast.error("Error sending password reset email: " + error.message);
+            });
     };
 
     return (
@@ -73,10 +90,13 @@ const Login = () => {
                             type="checkbox"
                             checked={isChecked}
                             onChange={handleCheckboxChange}
-                            className="mr-2"
+                            className="mr-2 cursor-pointer"
+                            id="terms-checkbox"
                             required
                         />
-                        <label className='text-white'>I agree to the terms and conditions</label>
+                        <label htmlFor="terms-checkbox" className='text-white cursor-pointer'>
+                            I agree to the terms and conditions
+                        </label>
                     </div>
                     <div className='mt-6'>
                         <button
@@ -90,7 +110,15 @@ const Login = () => {
                     </div>
                 </form>
                 <div className="text-center mt-6">
-                    <h1 className='text-white font-bold'>Not a Member? <Link className='text-[#08D665] underline' to={'/register'}>Register</Link></h1>
+                    <h1 className='text-white font-bold'>
+                        Not a Member? <Link className='text-[#08D665] underline' to={'/register'}>Register</Link>
+                    </h1>
+                    <button
+                        onClick={handleForgotPassword}
+                        className='text-[#08D665] underline mt-4'
+                    >
+                        Forgot Password?
+                    </button>
                 </div>
             </div>
         </div>
