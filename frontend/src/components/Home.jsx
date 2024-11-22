@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReactTyped } from "react-typed";
 import book from '../assets/book.png';
+import book2 from '../assets/gifbook.gif';
 
 const Home = ({contactRef}) => {
   const scrollToSection = (ref) => {
