@@ -5,11 +5,11 @@ import { toast, ToastContainer } from "react-toastify";
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null); 
+    const [user, setUser] = useState(null);
     const [isAuth, setIsAuth] = useState(false);
     const [btnLoading, setBtnLoading] = useState(false);
-    const [role, setRole] = useState(""); 
-    const [isLoading, setIsLoading] = useState(true); 
+    const [role, setRole] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     // Register user
     const registerUser = async (name, email, password, navigate) => {
@@ -17,7 +17,7 @@ export const UserProvider = ({ children }) => {
         try {
             const { data } = await axios.post("/api/user/register", { name, email, password });
             toast.success(data.message);
-            setIsAuth(true); 
+            setIsAuth(true);
             navigate('/login');
         } catch (error) {
             toast.error(error.response?.data?.message || "Registration failed. Please try again.");
@@ -53,9 +53,9 @@ export const UserProvider = ({ children }) => {
             setIsLoading(false);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to fetch user data.");
-            setIsAuth(false);   
+            setIsAuth(false);
             setIsLoading(false);
-        } 
+        }
     };
 
     useEffect(() => {
@@ -70,7 +70,7 @@ export const UserProvider = ({ children }) => {
             toast.success(data.message);
             setIsAuth(false);
             setUser(null);
-            setRole(""); 
+            setRole("");
             navigate('/login');
         } catch (error) {
             toast.error(error.response?.data?.message || "Logout failed. Please try again.");
@@ -79,9 +79,62 @@ export const UserProvider = ({ children }) => {
         }
     };
 
+    // Edit User
+    const editUser = async (userId, name, email) => {
+        setBtnLoading(true);
+        try {
+            const { data } = await axios.put(`/api/user/edit/${userId}`, { name, email });
+            toast.success(data.message);
+            if (userId === user._id) {
+                setUser(data.user);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Edit failed. Please try again.");
+        } finally {
+            setBtnLoading(false);
+        }
+    };
+
+    // Delete User
+    const deleteUser = async (userId) => {
+        setBtnLoading(true);
+        try {
+            const { data } = await axios.delete(`/api/user/delete/${userId}`);
+            toast.success(data.message);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Delete failed. Please try again.");
+        } finally {
+            setBtnLoading(false);
+        }
+    };
+
+    // Get All Users
+    const getAllUsers = async () => {
+        try {
+            const { data } = await axios.get("/api/user/getallusers");
+            return data;
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to fetch users.");
+            return [];
+        }
+    };
+
     return (
-        <UserContext.Provider value={{ registerUser, loginUser, logout, user, isAuth, btnLoading, role, isLoading }}>
-            {children}  <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+        <UserContext.Provider value={{
+            registerUser,
+            loginUser,
+            logout,
+            editUser,
+            deleteUser,
+            getAllUsers,
+            user,
+            isAuth,
+            btnLoading,
+            role,
+            isLoading
+        }}>
+            {children}
+            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
         </UserContext.Provider>
     );
 };

@@ -3,13 +3,13 @@ import { ScrollTrigger } from 'gsap/all';
 import React, { useEffect, useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { UserData } from '../context/User';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Navbar = ({ homeRef, aboutRef, cardRef, rulesRef, servicesRef, contactRef }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {logout} = UserData();
+  const {logout,user} = UserData();
   const navigate = useNavigate('/login');
   const handleLogout = () =>{
     logout(navigate);
@@ -69,6 +69,7 @@ const Navbar = ({ homeRef, aboutRef, cardRef, rulesRef, servicesRef, contactRef 
         <li className="hover:text-[#08D665] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(rulesRef)}>Rules</li>
         <li className="hover:text-[#08D665] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(contactRef)}>Contact</li>
         <button onClick={handleLogout} className='bg-red-500 text-white p-2 rounded-md'>Logout</button>
+        <Link to={"/admin"} className={`bg-green-500 text-white p-2 rounded-md ${user.role == "admin"?"":"hidden"}`}>Admin</Link>
       </ul>
     </div>
   );

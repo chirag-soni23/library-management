@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import { UserData } from './context/User';
 import Layout from './Layout';
 import Welcome from './pages/Welcome';
+import Admin from './pages/Admin';
 
 const App = () => {
   const { isAuth, isLoading } = UserData();
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/home" element={isAuth ? <Layout /> : <Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={isAuth ? <Layout /> : <Login />} />
+        <Route path="/admin" element={isAuth ? <Admin /> : <Login />} />
         
         {/* Optional: Add a catch-all route for 404 pages */}
         <Route path="*" element={<div>404 Not Found</div>} />

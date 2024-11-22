@@ -1,179 +1,161 @@
-import { useEffect, useState } from "react";
-import { UserData } from "../context/User"; // assuming UserContext is set up
+import React, { useEffect, useState } from "react";
+import { UserData } from "../context/User";
 import { toast } from "react-toastify";
+import {Link} from "react-router-dom";
 
 const Admin = () => {
-  const { getAllUsers, updateUser, deleteUser } = UserData();
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [editModal, setEditModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState({});
+  const { getAllUsers, editUser, deleteUser } = UserData();
 
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editUserId, setEditUserId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+
+  // Fetch all users on page load
   useEffect(() => {
     const fetchUsers = async () => {
-      try {
-        const usersData = await getAllUsers();
-        setUsers(usersData);
-        setFilteredUsers(usersData);  // Initially show all users
-      } catch (error) {
-        toast.error("Failed to fetch users.");
-      }
+      const userList = await getAllUsers();
+      setUsers(userList);
     };
     fetchUsers();
   }, [getAllUsers]);
 
-  // Handle the search filter
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    const filtered = users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        user.email.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        user.role.toLowerCase().includes(e.target.value.toLowerCase())
+  // Handle delete user
+  const handleDelete = async (userId) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      await deleteUser(userId);
+      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId));
+      toast.success("User deleted successfully!");
+    }
+  };
+
+  // Handle edit user (start editing)
+  const handleEdit = (user) => {
+    setEditUserId(user._id);
+    setEditName(user.name);
+    setEditEmail(user.email);
+  };
+
+  // Save the edited user details
+  const handleSave = async (userId) => {
+    await editUser(userId, editName, editEmail);
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user._id === userId ? { ...user, name: editName, email: editEmail } : user
+      )
     );
-    setFilteredUsers(filtered);
+    setEditUserId(null);
+    toast.success("User updated successfully!");
   };
 
-  // Handle Edit Modal open and close
-  const openEditModal = (user) => {
-    setCurrentUser(user);
-    setEditModal(true);
-  };
-
-  const closeEditModal = () => {
-    setEditModal(false);
-    setCurrentUser({});
-  };
-
-  // Handle Edit User
-  const handleEditUser = async (e) => {
-    e.preventDefault();
-    try {
-      const updatedUser = await updateUser(currentUser._id, currentUser);
-      toast.success("User updated successfully");
-      setUsers(users.map((user) => (user._id === updatedUser._id ? updatedUser : user)));
-      closeEditModal();
-    } catch (error) {
-      toast.error("Failed to update user");
-    }
-  };
-
-  // Handle Delete User
-  const handleDeleteUser = async (id) => {
-    try {
-      await deleteUser(id);
-      toast.success("User deleted successfully");
-      setUsers(users.filter((user) => user._id !== id));
-    } catch (error) {
-      toast.error("Failed to delete user");
-    }
-  };
+  // Filter users based on search term
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.role.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="container mx-auto p-4">
-      {/* Search Bar */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search by Name, Email, Role"
-          value={searchQuery}
-          onChange={handleSearch}
-          className="p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+    <div className="p-4 text-white">
+      <div className="w-full mb-2 items-center flex justify-between">
+      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+      <Link to={"/home"} className="bg-green-500 p-2 rounded-md text-white flex items-center justify-center">Home</Link>
       </div>
 
-      {/* Table to display users */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
-          <thead className="bg-gray-100 text-gray-600">
-            <tr>
-              <th className="py-2 px-4 text-left">Name</th>
-              <th className="py-2 px-4 text-left">Email</th>
-              <th className="py-2 px-4 text-left">Role</th>
-              <th className="py-2 px-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-700">
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user) => (
-                <tr key={user._id}>
-                  <td className="py-2 px-4">{user.name}</td>
-                  <td className="py-2 px-4">{user.email}</td>
-                  <td className="py-2 px-4">{user.role}</td>
-                  <td className="py-2 px-4">
-                    <button
-                      onClick={() => openEditModal(user)}
-                      className="px-4 py-2 text-white bg-blue-500 rounded-lg mr-2 hover:bg-blue-600"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user._id)}
-                      className="px-4 py-2 text-white bg-red-500 rounded-lg hover:bg-red-600"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="py-2 px-4 text-center text-gray-500">
-                  No users found.
+      {/* Search Bar */}
+      <input
+        type="text"
+        placeholder="Search by name, email, or role"
+        className="border rounded p-2 mb-4 w-full"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      {/* User Table */}
+      <table className="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr>
+            <th className="border border-gray-300 p-2">Name</th>
+            <th className="border border-gray-300 p-2">Email</th>
+            <th className="border border-gray-300 p-2">Role</th>
+            <th className="border border-gray-300 p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <tr key={user._id} className="text-center">
+                <td className="border border-gray-300 p-2">
+                  {editUserId === user._id ? (
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="border text-black rounded p-1 w-full"
+                    />
+                  ) : (
+                    user.name
+                  )}
+                </td>
+                <td className="border border-gray-300 p-2">
+                  {editUserId === user._id ? (
+                    <input
+                      type="text"
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="border text-black rounded p-1 w-full"
+                    />
+                  ) : (
+                    user.email
+                  )}
+                </td>
+                <td className="border border-gray-300 p-2">{user.role}</td>
+                <td className="border border-gray-300 p-2 space-x-2">
+                  {editUserId === user._id ? (
+                    <>
+                      <button
+                        onClick={() => handleSave(user._id)}
+                        className="bg-green-500 text-white px-3 py-1 rounded"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditUserId(null)}
+                        className="bg-gray-500 text-white px-3 py-1 rounded"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleEdit(user)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(user._id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Edit User Modal */}
-      {editModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-xl font-semibold mb-4">Edit User</h2>
-            <form onSubmit={handleEditUser}>
-              <input
-                type="text"
-                value={currentUser.name}
-                onChange={(e) => setCurrentUser({ ...currentUser, name: e.target.value })}
-                className="w-full p-2 mb-4 border border-gray-300 rounded"
-                placeholder="Name"
-              />
-              <input
-                type="email"
-                value={currentUser.email}
-                onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
-                className="w-full p-2 mb-4 border border-gray-300 rounded"
-                placeholder="Email"
-              />
-              <input
-                type="text"
-                value={currentUser.role}
-                onChange={(e) => setCurrentUser({ ...currentUser, role: e.target.value })}
-                className="w-full p-2 mb-4 border border-gray-300 rounded"
-                placeholder="Role"
-              />
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={closeEditModal}
-                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md mr-2"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="p-4 text-gray-500">
+                No users found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
