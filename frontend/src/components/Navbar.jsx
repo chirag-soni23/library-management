@@ -9,67 +9,160 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Navbar = ({ homeRef, aboutRef, cardRef, rulesRef, servicesRef, contactRef }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {logout,user} = UserData();
-  const navigate = useNavigate('/login');
-  const handleLogout = () =>{
+  const { logout, user } = UserData();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
     logout(navigate);
-  }
+  };
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    if (window.innerWidth <= 768) {
-      gsap.to(".navbar", {
-        backgroundColor: "#ffffff",
-        scrollTrigger: {
-          trigger: ".navbar",
-          start: "top top",
-          toggleActions: "play none none reverse",
-        },
-      });
-    }
-  }, []);
-
   const scrollToSection = (ref) => {
-    const offset = 100;
+    const offset = 100; // Adjust for sticky header height
     const elementPosition = ref.current.getBoundingClientRect().top;
-    console.log(window.scrollY)
     const offsetPosition = elementPosition + window.scrollY - offset;
 
     window.scrollTo({
       top: offsetPosition,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
-    setIsOpen(false);
+    setIsOpen(false); // Close menu after scrolling
   };
 
   return (
-    <div className={`navbar w-full p-6 flex justify-between lg:px-40 sm:px-4 items-center font-bold fixed z-50 left-0 top-0 right-0 bg-black`}>
-      <div className="name">
-        <h1 className="text-3xl text-[#08D665] uppercase">library hub</h1>
-      </div>
+    <div className="navbar fixed top-0 left-0 right-0 w-full bg-black z-50 p-4 lg:px-20 flex justify-between items-center shadow-md">
+      {/* Logo */}
+      <div className="text-3xl text-[#08D665] uppercase font-bold">Library Hub</div>
+
+      {/* Mobile menu toggle */}
       <div
-        className="md:hidden text-white bg-[#06110b] flex items-center justify-center p-2 rounded text-2xl cursor-pointer"
+        className="md:hidden text-white bg-[#06110b] p-2 rounded text-2xl cursor-pointer"
         onClick={toggleMenu}
       >
         {isOpen ? <FaTimes /> : <FaBars />}
       </div>
-      {/* Menu items */}
-      <ul
-        className={`${
-          isOpen ? 'block' : 'hidden'
-        } md:flex text-white outline-none items-center gap-6 absolute md:static top-20 left-0 w-full md:w-auto md:bg-transparent bg-black p-6 md:p-0 transition-all duration-300`}
-      >
-        <li className="hover:text-[#08D665] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(homeRef)}>Home</li>
-        <li className="hover:text-[rgb(8,214,101)] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(aboutRef)}>About</li>
-        <li className="hover:text-[rgb(8,214,101)] cursor-pointer transition-colors duration-300" onClick={() => scrollToSection(servicesRef)}>Services</li>
-        <li className="hover:text-[#08D665] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(cardRef)}>Facilities</li>
-        <li className="hover:text-[#08D665] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(rulesRef)}>Rules</li>
-        <li className="hover:text-[#08D665] cursor-pointer transition-all duration-300" onClick={() => scrollToSection(contactRef)}>Contact</li>
-        <button onClick={handleLogout} className='bg-red-500 text-white p-2 rounded-md'>Logout</button>
-        <Link to={"/admin"} className={`bg-green-500 text-white p-2 rounded-md ${user.role == "admin"?"":"hidden"}`}>Admin</Link>
+
+      {/* Full-screen overlay menu for small screens */}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-95 flex flex-col items-center justify-center gap-8 text-white z-50 md:hidden">
+          {/* Cross Button */}
+          <div
+            className="absolute top-5 right-5 text-3xl text-white cursor-pointer"
+            onClick={toggleMenu}
+          >
+            <FaTimes />
+          </div>
+
+          <ul className="flex flex-col gap-8 text-lg font-medium items-center">
+            <li
+              className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+              onClick={() => scrollToSection(homeRef)}
+            >
+              Home
+            </li>
+            <li
+              className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+              onClick={() => scrollToSection(aboutRef)}
+            >
+              About
+            </li>
+            <li
+              className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+              onClick={() => scrollToSection(servicesRef)}
+            >
+              Services
+            </li>
+            <li
+              className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+              onClick={() => scrollToSection(cardRef)}
+            >
+              Facilities
+            </li>
+            <li
+              className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+              onClick={() => scrollToSection(rulesRef)}
+            >
+              Rules
+            </li>
+            <li
+              className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+              onClick={() => scrollToSection(contactRef)}
+            >
+              Contact
+            </li>
+          </ul>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition-all duration-300"
+          >
+            Logout
+          </button>
+          <Link
+            to="/admin"
+            className={`bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition-all duration-300 ${
+              user.role === "admin" ? "" : "hidden"
+            }`}
+          >
+            Admin
+          </Link>
+        </div>
+      )}
+
+      {/* Horizontal menu for large screens */}
+      <ul className="hidden md:flex gap-8 text-white items-center">
+        <li
+          className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+          onClick={() => scrollToSection(homeRef)}
+        >
+          Home
+        </li>
+        <li
+          className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+          onClick={() => scrollToSection(aboutRef)}
+        >
+          About
+        </li>
+        <li
+          className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+          onClick={() => scrollToSection(servicesRef)}
+        >
+          Services
+        </li>
+        <li
+          className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+          onClick={() => scrollToSection(cardRef)}
+        >
+          Facilities
+        </li>
+        <li
+          className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+          onClick={() => scrollToSection(rulesRef)}
+        >
+          Rules
+        </li>
+        <li
+          className="hover:text-[#08D665] cursor-pointer transition-all duration-300"
+          onClick={() => scrollToSection(contactRef)}
+        >
+          Contact
+        </li>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition-all duration-300"
+        >
+          Logout
+        </button>
+        <Link
+          to="/admin"
+          className={`bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition-all duration-300 ${
+            user.role === "admin" ? "" : "hidden"
+          }`}
+        >
+          Admin
+        </Link>
       </ul>
     </div>
   );
