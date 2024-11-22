@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserData } from '../context/User';
 import { toast } from 'react-toastify';
-import { auth } from '../Firebase';
-import { sendPasswordResetEmail } from "firebase/auth";
+
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -30,21 +29,7 @@ const Login = () => {
         loginUser(email, password, role, () => navigate('/home'));
     };
 
-    const handleForgotPassword = () => {
-        if (!email) {
-            toast.error("Please enter your email to reset your password.");
-            return;
-        }
-
-        sendPasswordResetEmail(auth, email)
-            .then(() => {
-                toast.success("Password reset email sent! Check your inbox.");
-            })
-            .catch((error) => {
-                toast.error("Error sending password reset email: " + error.message);
-            });
-    };
-
+   
     return (
         <div className='w-full h-screen p-4 flex justify-center items-center bg-black relative overflow-hidden'>
             <div className='max-w-md w-full p-6 rounded-lg shadow-white bg-black relative z-10 shadow-md'>
@@ -113,12 +98,6 @@ const Login = () => {
                     <h1 className='text-white font-bold'>
                         Not a Member? <Link className='text-[#08D665] underline' to={'/register'}>Register</Link>
                     </h1>
-                    <button
-                        onClick={handleForgotPassword}
-                        className='text-[#08D665] underline mt-4'
-                    >
-                        Forgot Password?
-                    </button>
                 </div>
             </div>
         </div>
