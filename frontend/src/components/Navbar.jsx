@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { UserData } from '../context/User';
 import { Link, useNavigate } from 'react-router-dom';
@@ -21,7 +21,7 @@ const Navbar = ({ homeRef, aboutRef, cardRef, rulesRef, servicesRef, contactRef 
   };
 
   const scrollToSection = (ref) => {
-    const offset = 100; // Adjust for sticky header height
+    const offset = 100; 
     const elementPosition = ref.current.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.scrollY - offset;
 
@@ -29,7 +29,7 @@ const Navbar = ({ homeRef, aboutRef, cardRef, rulesRef, servicesRef, contactRef 
       top: offsetPosition,
       behavior: 'smooth',
     });
-    setIsOpen(false); // Close menu after scrolling
+    setIsOpen(false);
   };
 
   return (

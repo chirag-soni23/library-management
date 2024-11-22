@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from 'react-router-dom';
 
 const Welcome = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal starts as closed
+  const [isModalOpen, setIsModalOpen] = useState(false); 
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -38,12 +38,12 @@ const Welcome = () => {
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Please Log In First</h2>
             <p className="text-gray-600 mb-6">You need to log in to access the library management system.</p>
             <div className="flex gap-4 justify-center">
-              <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
-                <Link to={'/register'}>Sign Up</Link>
-              </button>
-              <button className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
-                <Link to={'/login'}>Log in</Link>
-              </button>
+              <Link to={"/register"} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
+                Sign Up
+              </Link>
+              <Link to={"/login"} className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                Log in
+              </Link>
             </div>
             <button
               onClick={closeModal}

@@ -68,7 +68,7 @@ const Admin = () => {
       <input
         type="text"
         placeholder="Search by name, email, or role"
-        className="border rounded p-2 mb-4 w-full"
+        className="border text-black rounded p-2 mb-4 w-full"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
