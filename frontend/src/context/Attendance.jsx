@@ -15,7 +15,7 @@ const AttendanceProvider = ({ children }) => {
       const response = await axios.get('/api/attendance/get-attendance');
       setAttendanceHistory(response.data.map((record) => record.date));
     } catch (error) {
-      toast.error('Failed to fetch attendance records.');
+      console.error('Failed to fetch attendance records.');
     }
   };
 
