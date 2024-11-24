@@ -14,7 +14,7 @@ function Thoughts() {
   const continuousThoughts = [...thoughtsArray, ...thoughtsArray];
 
   return (
-    <div className="overflow-hidden bg-black p-4">
+    <div className="overflow-hidden mt-10 border border-t-white border-l-transparent border-r-transparent border-t-[20px] bg-black p-4">
       <div className="animate-scroll whitespace-nowrap flex">
         {continuousThoughts.map((thought, index) => (
           <span key={index} className="text-[#08D665] text-xl mx-8">
